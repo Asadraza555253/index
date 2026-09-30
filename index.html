@@ -1,0 +1,154 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Care Connect CRM Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f6fa;--card:#fff;--tx:#1c2333;--mut:#667085;--hd:#1f3a68;--blue:#b4c6e7;--grey:#d9d9d9;--green:#c6e0b4;--bar:#f4a3a3;--red:#d92d20;--ln:#d0d5dd}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11151c;--card:#1b212c;--tx:#e6e9ef;--mut:#98a2b3;--hd:#2b4b82;--blue:#2a3d63;--grey:#2f3644;--green:#2f4a2f;--bar:#7a3535;--red:#ff7a70;--ln:#39424f}}
+:root[data-theme="dark"]{--bg:#11151c;--card:#1b212c;--tx:#e6e9ef;--mut:#98a2b3;--hd:#2b4b82;--blue:#2a3d63;--grey:#2f3644;--green:#2f4a2f;--bar:#7a3535;--red:#ff7a70;--ln:#39424f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 Arial,Helvetica,sans-serif}
+header{background:var(--hd);color:#fff;padding:16px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+h1{margin:0;font-size:20px}header small{opacity:.8}
+button,label.b{background:#fff;color:#1f3a68;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px}
+main{padding:16px 20px;max-width:1200px;margin:auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.k,.c{background:var(--card);border:1px solid var(--ln);border-radius:10px;padding:14px}
+.k b{display:block;font-size:24px}.k span{color:var(--mut);font-size:12px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.c h2{margin:0 0 10px;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:8px}.dl{background:var(--hd);color:#fff;padding:5px 10px;font-size:12px}.w{overflow-x:auto}
+table{border-collapse:collapse;width:100%;text-align:center}th,td{border:1px solid var(--ln);padding:5px 8px;white-space:nowrap}
+th{background:var(--card);color:var(--tx);font-weight:700}td.l{background:var(--blue);text-align:left}td.r{background:var(--grey);font-weight:700}
+tr.t td{background:var(--grey);font-weight:700}tr.p td{background:var(--green);font-weight:700}
+.bar{position:relative;text-align:right;min-width:70px}.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--bar);z-index:0}.bar s{position:relative;text-decoration:none;font-weight:700}
+.red{color:var(--red);font-weight:700}
+ul{margin:0;padding-left:18px}li{margin:4px 0}.full{grid-column:1/-1}
+#msg{font-size:12px;color:#fff;opacity:.9}
+</style></head><body>
+<header><div><h1>Care Connect – CRM Dashboard</h1><small id="src">Loaded: sample CRM report</small></div>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span id="msg"></span>
+<button id="all">⬇ Download all reports (Excel)</button>
+<label class="b">⬆ Upload CRM file<input id="up" type="file" accept=".xlsx,.xls,.csv" hidden></label></div></header>
+<main>
+<div class="kpis" id="kpis"></div>
+<div class="g">
+<div class="c"><h2><span>Segment by Region</span><button class="dl" data-t="t1" data-n="Segment by Region">⬇ Excel</button></h2><div class="w" id="t1"></div></div>
+<div class="c"><h2><span>Product by Region</span><button class="dl" data-t="t3" data-n="Product by Region">⬇ Excel</button></h2><div class="w" id="t3"></div></div>
+<div class="c"><h2><span>Priority by Region</span><button class="dl" data-t="t4" data-n="Priority by Region">⬇ Excel</button></h2><div class="w" id="t4"></div></div>
+<div class="c"><h2><span>Call Nature by Region</span><button class="dl" data-t="t5" data-n="Call Nature by Region">⬇ Excel</button></h2><div class="w" id="t5"></div></div>
+<div class="c"><h2><span>Ageing - BD TAT by Region</span><button class="dl" data-t="t6" data-n="Ageing - BD TAT by Region">⬇ Excel</button></h2><div class="w" id="t6"></div></div>
+<div class="c"><h2><span>Daily Ticket Trend by Region</span><button class="dl" data-t="t7" data-n="Daily Ticket Trend by Region">⬇ Excel</button></h2><div class="w" id="t7"></div></div>
+<div class="c full"><h2><span>Region / City by TI TAT (days)</span><button class="dl" data-t="t2" data-n="City by TI TAT">⬇ Excel</button></h2><div class="w" id="t2"></div></div>
+<div class="c full"><h2>AI insights</h2><ul id="ins"></ul></div>
+</div></main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script>
+var DATA=[["Call Center","HD","SOUTH","HYDERABAD",6,"High","Late Delivery",9,"24-09-2026"],["Call Center","HD","SOUTH","KARACHI",6,"High","Late Delivery",8,"24-09-2026"],["Corporate","COD HD","SOUTH","KARACHI",5,"Normal","Late Delivery",9,"25-09-2026"],["Corporate","COD HD","CENTRAL","LAHORE",4,"High","Reattempt",8,"26-09-2026"],["Corporate","COD HD","NORTH","GUJRAT",4,"High","Reattempt",8,"26-09-2026"],["Call Center","CARGO","NORTH","RAWALPINDI",2,"High","Late Delivery",6,"28-09-2026"],["Corporate","HD","NORTH","GUJRAT",2,"High","Partial Delivery",7,"28-09-2026"],["Corporate","COD HD","NORTH","GUJRANWALA",2,"Normal","Reattempt",5,"28-09-2026"],["Call Center","COD HD","NORTH","GUJRAT",2,"High","Late Delivery",6,"28-09-2026"],["Corporate","COD HD","SOUTH","KARACHI",2,"Normal","Reattempt",8,"28-09-2026"],["Call Center","HD","NORTH","RAWALPINDI",2,"High","Late Delivery",6,"28-09-2026"],["Franchise","COD HD","SOUTH","KARACHI",2,"Critical","Late Delivery",4,"28-09-2026"],["Franchise","COD HD","SOUTH","KARACHI",1,"High","Late Delivery",6,"29-09-2026"],["Corporate","HD","NORTH","GUJRAT",1,"High","Late Delivery",6,"29-09-2026"],["Franchise","COD HD","NORTH","RAWALPINDI",1,"High","Late Delivery",4,"29-09-2026"],["Call Center","CARGO","CENTRAL","LAHORE",1,"Critical","Partial Dispatch",7,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"Normal","Partial Delivery",8,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",8,"29-09-2026"],["Corporate","COD HD","SOUTH","KARACHI",1,"Normal","Late Delivery",4,"29-09-2026"],["Social Media","COD HD","NORTH","ABBOTTABAD",1,"High","Late Delivery",7,"29-09-2026"],["Call Center","HD","NORTH","PESHAWAR",1,"High","Late Delivery",8,"29-09-2026"],["Call Center","HD","SOUTH","KARACHI",1,"High","Reattempt",4,"29-09-2026"],["Corporate","HD","NORTH","ABBOTTABAD",1,"Normal","Late Delivery",7,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",6,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"High","Late Delivery",6,"29-09-2026"],["Call Center","HD","NORTH","PESHAWAR",1,"High","Late Delivery",5,"29-09-2026"],["Corporate","HD","NORTH","GUJRAT",1,"High","Late Delivery",5,"29-09-2026"],["Corporate","HD","NORTH","GUJRAT",1,"High","Late Delivery",4,"29-09-2026"],["Call Center","HD","NORTH","PESHAWAR",1,"Critical","Late Delivery",7,"29-09-2026"],["Corporate","HD","NORTH","GUJRAT",1,"High","Late Delivery",6,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"High","Late Delivery",5,"29-09-2026"],["Corporate","HD","NORTH","GUJRAT",1,"High","Late Delivery",4,"29-09-2026"],["Call Center","HD","NORTH","RAWALPINDI",1,"Critical","Late Delivery",7,"29-09-2026"],["Call Center","HD","NORTH","PESHAWAR",1,"High","Late Delivery",6,"29-09-2026"],["Call Center","CARGO","NORTH","RAWALPINDI",1,"Critical","Partial Dispatch",6,"29-09-2026"],["Call Center","COD HD","NORTH","RAWALPINDI",1,"Critical","Late Delivery",5,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",5,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",7,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",7,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"High","Late Delivery",6,"29-09-2026"],["Corporate","HD","NORTH","GUJRAT",1,"High","Late Delivery",5,"29-09-2026"],["Corporate","HD","NORTH","GUJRAT",1,"High","Late Delivery",5,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"Normal","Partial Delivery",13,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",11,"29-09-2026"],["Corporate","HD","NORTH","JHELUM",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","CENTRAL","LAHORE",1,"Normal","Late Delivery",7,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Normal","Partial Delivery",7,"29-09-2026"],["Corporate","HD","NORTH","GUJRANWALA",1,"Normal","Late Delivery",7,"29-09-2026"],["Corporate","HD","SOUTH","KARACHI",1,"Normal","Late Delivery",7,"29-09-2026"],["Corporate","HD","NORTH","JHELUM",1,"Normal","Late Delivery",6,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",11,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"Normal","Late Delivery",9,"29-09-2026"],["Call Center","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"Normal","Late Delivery",9,"29-09-2026"],["Call Center","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Low","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","JHELUM",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","PESHAWAR",1,"Normal","Late Delivery",9,"29-09-2026"],["Corporate","HD","NORTH","RAWALPINDI",1,"Normal","Late Delivery",9,"29-09-2026"],["Call Center","HD","SOUTH","KARACHI",1,"Critical","Late Delivery",4,"29-09-2026"],["Call Center","HD","CENTRAL","JHANG",1,"High","Late Delivery",4,"29-09-2026"],["Franchise","COD HD","SOUTH","KARACHI",1,"High","Late Delivery",7,"29-09-2026"],["Call Center","COD HD","NORTH","PESHAWAR",1,"High","Late Delivery",7,"29-09-2026"],["Call Center","HD","CENTRAL","FAISALABAD",1,"Critical","Late Delivery",3,"29-09-2026"],["Call Center","CARGO","NORTH","RAWALPINDI",1,"High","Late Delivery",2,"29-09-2026"],["Corporate","HD","NORTH","MIANWALI",0,"High","Fake Reason",8,"30-09-2026"],["Corporate","HD","NORTH","MIANWALI",0,"High","Late Delivery",7,"30-09-2026"],["Corporate","COD HD","NORTH","SIALKOT",0,"Normal","Reattempt",4,"30-09-2026"],["Franchise","COD HD","CENTRAL","FAISALABAD",0,"High","Late Delivery",2,"30-09-2026"],["Corporate","COD HD","NORTH","GUJRANWALA",0,"Normal","Late Delivery",2,"30-09-2026"],["Call Center","CARGO","NORTH","PESHAWAR",0,"High","Late Delivery",2,"30-09-2026"],["Call Center","HD","SOUTH","KARACHI",0,"Critical","Late Delivery",4,"30-09-2026"],["Call Center","CARGO","NORTH","ABBOTTABAD",0,"Critical","Partial Dispatch",1,"30-09-2026"],["Call Center","COD HD","SOUTH","SUKKAR",0,"Critical","Late Delivery",5,"30-09-2026"],["Call Center","HD","NORTH","PESHAWAR",0,"High","Late Delivery",8,"30-09-2026"],["Corporate","COD HD","NORTH","PESHAWAR",0,"High","Reattempt",7,"30-09-2026"],["Corporate","COD HD","NORTH","GUJRAT",0,"High","Late Delivery",4,"30-09-2026"],["Corporate","COD HD","CENTRAL","LAHORE",0,"High","Reattempt",1,"30-09-2026"],["Corporate","COD HD","CENTRAL","JHANG",0,"High","Reattempt",9,"30-09-2026"],["Corporate","HD","NORTH","GUJRANWALA",0,"High","Late Delivery",2,"30-09-2026"],["Corporate","HD","CENTRAL","SARGODHA",0,"High","Late Delivery",2,"30-09-2026"],["Call Center","HD","NORTH","PESHAWAR",0,"Critical","Late Delivery",2,"30-09-2026"],["Corporate","HD","NORTH","PESHAWAR",0,"High","Partial Delivery",2,"30-09-2026"],["Corporate","COD HD","CENTRAL","LAHORE",0,"High","Reattempt",1,"30-09-2026"],["Corporate","COD HD","NORTH","RAWALPINDI",0,"High","Reattempt",1,"30-09-2026"],["Corporate","COD HD","CENTRAL","LAHORE",0,"High","Reattempt",1,"30-09-2026"],["Corporate","COD HD","CENTRAL","LAHORE",0,"High","Reattempt",1,"30-09-2026"],["Corporate","COD HD","CENTRAL","LAHORE",0,"High","Reattempt",1,"30-09-2026"],["Corporate","COD HD","CENTRAL","LAHORE",0,"High","Reattempt",1,"30-09-2026"],["Corporate","COD HD","NORTH","RAWALPINDI",0,"High","Reattempt",2,"30-09-2026"],["Corporate","COD HD","NORTH","RAWALPINDI",0,"High","Reattempt",2,"30-09-2026"],["Corporate","COD HD","NORTH","GUJRANWALA",0,"High","Reattempt",2,"30-09-2026"],["Corporate","COD HD","SOUTH","HYDERABAD",0,"High","Reattempt",4,"30-09-2026"],["Corporate","HD","NORTH","GUJRANWALA",0,"High","Late Delivery",2,"30-09-2026"],["Corporate","COD HD","CENTRAL","LAHORE",0,"High","Reattempt",6,"30-09-2026"],["Corporate","COD HD","NORTH","PESHAWAR",0,"High","Reattempt",7,"30-09-2026"],["Corporate","HD","NORTH","DERA ISMAIL KHAN",0,"High","Partial Delivery",5,"30-09-2026"],["Call Center","HD","CENTRAL","LAHORE",0,"High","Late Delivery",2,"30-09-2026"],["Call Center","COD HD","NORTH","GUJRAT",0,"Critical","Late Delivery",2,"30-09-2026"],["Call Center","CARGO","NORTH","RAWALPINDI",0,"Critical","Late Delivery",2,"30-09-2026"],["Call Center","CARGO","CENTRAL","JHANG",0,"High","Late Delivery",2,"30-09-2026"],["Call Center","COD HD","NORTH","SIALKOT",0,"High","Late Delivery",4,"30-09-2026"],["Corporate","HD","NORTH","PESHAWAR",0,"Normal","Late Delivery",8,"30-09-2026"],["Corporate","HD","NORTH","PESHAWAR",0,"Normal","Partial Delivery",9,"30-09-2026"],["Call Center","COD HD","NORTH","RAWALPINDI",0,"High","Late Delivery",6,"30-09-2026"],["Call Center","CARGO","CENTRAL","LAHORE",0,"High","Late Delivery",1,"30-09-2026"],["Corporate","COD HD","CENTRAL","MULTAN",0,"Normal","Reattempt",2,"30-09-2026"],["Corporate","COD HD","CENTRAL","LAHORE",0,"Normal","Reattempt",2,"30-09-2026"],["Corporate","COD HD","CENTRAL","LAHORE",0,"Normal","Reattempt",2,"30-09-2026"],["Call Center","COD HD","SOUTH","KARACHI",0,"Critical","COD Late Reimbursement",28,"30-09-2026"],["Call Center","HD","CENTRAL","LAHORE",0,"Critical","Late Delivery",4,"30-09-2026"],["Call Center","HD","NORTH","PESHAWAR",0,"High","Late Delivery",4,"30-09-2026"],["Call Center","HD","NORTH","RAWALPINDI",0,"High","Late Delivery",8,"30-09-2026"],["Corporate","COD HD","SOUTH","KARACHI",0,"Normal","Late Delivery",7,"30-09-2026"],["Corporate","COD HD","SOUTH","KARACHI",0,"Normal","Late Delivery",7,"30-09-2026"],["Corporate","COD HD","SOUTH","KARACHI",0,"Normal","Late Delivery",6,"30-09-2026"],["Corporate","COD HD","SOUTH","KARACHI",0,"Normal","Late Delivery",6,"30-09-2026"],["Corporate","COD HD","SOUTH","KARACHI",0,"Normal","Late Delivery",9,"30-09-2026"],["Corporate","COD HD","SOUTH","KARACHI",0,"Normal","Late Delivery",6,"30-09-2026"],["Corporate","COD HD","NORTH","RAWALPINDI",0,"Normal","Late Delivery",1,"30-09-2026"],["Corporate","COD HD","NORTH","RAWALPINDI",0,"Normal","Late Delivery",1,"30-09-2026"],["Corporate","COD HD","NORTH","RAWALPINDI",0,"Normal","Late Delivery",1,"30-09-2026"],["Corporate","COD HD","NORTH","RAWALPINDI",0,"High","Late Delivery",1,"30-09-2026"],["Corporate","COD HD","NORTH","RAWALPINDI",0,"Normal","Late Delivery",1,"30-09-2026"],["Corporate","COD HD","NORTH","RAWALPINDI",0,"Normal","Late Delivery",1,"30-09-2026"],["Call Center","CODT2T","CENTRAL","LAHORE",0,"High","COD Late Reimbursement",10,"30-09-2026"]];
+var COLS=['SNO','TicketId','CN','Barcode','Ticket_Type','Category','Call Nature','Booking_Date','Priority','Created By','Created_Date','Created_Time','TI TAT','BD TAT','OPS Closed TAT','Ticket Close TAT','Product','Region - Problem Occurred At','City - Problem Occurred At','Location','Source Terminal','Source CCP','Source Region','Destination','Destination CCP','Destination Region','Status','OPS Closed Status','CX Remarks','Operation Remarks','Operation User Name','Final Remarks','EmailAddress','Ticket_Closed_Date','info_source'];
+var $=function(i){return document.getElementById(i)};
+function esc(s){return String(s).replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+function cnt(rows,kf){var m={};rows.forEach(function(r){var k=kf(r);m[k]=(m[k]||0)+1});return m}
+function keysByTotal(rows,i){var m=cnt(rows,function(r){return r[i]});return Object.keys(m).sort(function(a,b){return m[b]-m[a]||a.localeCompare(b)})}
+function bar(v,max){return '<td class="bar"><i style="width:'+(max?v/max*100:0)+'%"></i><s>'+v+'</s></td>'}
+function cross(rows,ri,regs,label,ord){
+ var keys=ord||keysByTotal(rows,ri),tot=rows.length,mx=Math.max.apply(null,keys.map(function(k){return rows.filter(function(r){return r[ri]===k}).length}));
+ var h='<table><tr><th>'+label+'</th>'+regs.map(function(g){return'<th>'+g+'</th>'}).join('')+'<th>Grand Total</th><th>%Age</th></tr>';
+ keys.forEach(function(k){var rr=rows.filter(function(r){return r[ri]===k});
+  h+='<tr><td class="l">'+esc(k)+'</td>'+regs.map(function(g){var n=rr.filter(function(r){return r[2]===g}).length;return'<td class="l">'+(n||'')+'</td>'}).join('')+bar(rr.length,mx)+'<td>'+(rr.length/tot*100).toFixed(1)+'%</td></tr>'});
+ h+='<tr class="t"><td>Grand Total</td>'+regs.map(function(g){return'<td>'+rows.filter(function(r){return r[2]===g}).length+'</td>'}).join('')+'<td>'+tot+'</td><td>100%</td></tr>';
+ h+='<tr class="p"><td>%Age</td>'+regs.map(function(g){return'<td>'+Math.round(rows.filter(function(r){return r[2]===g}).length/tot*100)+'%</td>'}).join('')+'<td>100%</td><td></td></tr></table>';return h}
+function tatTable(rows,regs){
+ var tats=Object.keys(cnt(rows,function(r){return r[4]})).map(Number).sort(function(a,b){return a-b});
+ var mx=Math.max.apply(null,Object.values(cnt(rows,function(r){return r[3]})));
+ var cell=function(v,t){return'<td'+(t>=4&&v?' class="red"':'')+'>'+(v||'')+'</td>'};
+ var h='<table><tr><th>Region</th><th>City</th>'+tats.map(function(t){return'<th>'+t+'</th>'}).join('')+'<th>Grand Total</th></tr>';
+ regs.forEach(function(g){var rr=rows.filter(function(r){return r[2]===g}),cities=keysByTotal(rr,3);
+  cities.forEach(function(c,i){var cr=rr.filter(function(r){return r[3]===c});
+   h+='<tr>'+(i?'':'<td class="r" rowspan="'+cities.length+'">'+g+'</td>')+'<td class="l">'+esc(c)+'</td>'+tats.map(function(t){return cell(cr.filter(function(r){return r[4]===t}).length,t)}).join('')+bar(cr.length,mx)+'</tr>'});
+  h+='<tr class="t"><td colspan="2">'+g+' Total</td>'+tats.map(function(t){return'<td>'+(rr.filter(function(r){return r[4]===t}).length||'')+'</td>'}).join('')+'<td>'+rr.length+'</td></tr>'});
+ h+='<tr class="t"><td colspan="2">Grand Total</td>'+tats.map(function(t){return'<td>'+rows.filter(function(r){return r[4]===t}).length+'</td>'}).join('')+'<td>'+rows.length+'</td></tr></table>';return h}
+function render(rows){
+ var regs=Object.keys(cnt(rows,function(r){return r[2]})).sort(),n=rows.length;
+ var avg=rows.reduce(function(s,r){return s+r[4]},0)/n,late=rows.filter(function(r){return r[4]>=4}).length;
+ var pct=function(m){var k=Object.keys(m).sort(function(a,b){return m[b]-m[a]})[0];return[k,m[k]]};
+ var tr=pct(cnt(rows,function(r){return r[2]})),tp=pct(cnt(rows,function(r){return r[1]})),ts=pct(cnt(rows,function(r){return r[0]})),tc=pct(cnt(rows,function(r){return r[3]}));
+ var K=[[n,'Total tickets'],[tr[0]+' '+Math.round(tr[1]/n*100)+'%','Top region'],[tp[0]+' '+Math.round(tp[1]/n*100)+'%','Top product'],[avg.toFixed(1),'Avg TI TAT (days)'],[late,'Tickets with TAT ≥ 4 days']];
+ $('kpis').innerHTML=K.map(function(k){return'<div class="k"><b>'+esc(k[0])+'</b><span>'+k[1]+'</span></div>'}).join('');
+ rows.forEach(function(r){var b=r[7];r[9]=b==null?'N/A':b<=3?'0-3 days':b<=7?'4-7 days':b<=10?'8-10 days':'11+ days'});
+ var dk=cnt(rows,function(r){return r[8]}),dates=Object.keys(dk).sort(function(a,b){var f=function(s){var p=s.split('-');return p.length==3?p[2]+p[1]+p[0]:s};return f(a)<f(b)?-1:1});
+ var ag=['0-3 days','4-7 days','8-10 days','11+ days','N/A'].filter(function(k){return rows.some(function(r){return r[9]===k})});
+ $('t1').innerHTML=cross(rows,0,regs,'Segment');$('t3').innerHTML=cross(rows,1,regs,'Product');$('t2').innerHTML=tatTable(rows,regs);
+ $('t4').innerHTML=cross(rows,5,regs,'Priority');$('t5').innerHTML=cross(rows,6,regs,'Call Nature');
+ $('t6').innerHTML=cross(rows,9,regs,'BD TAT Ageing',ag);$('t7').innerHTML=cross(rows,8,regs,'Created Date',dates);
+ var crit=rows.filter(function(r){return r[5]==='Critical'||r[5]==='High'}).length,old=rows.filter(function(r){return r[7]!=null&&r[7]>7}).length,cn=pct(cnt(rows,function(r){return r[6]}));
+ window.KP=K;window.CUR={rows:rows,regs:regs,dates:dates,ag:ag};
+ var I=[ts[0]+' is the leading ticket source with '+ts[1]+' tickets ('+Math.round(ts[1]/n*100)+'%).',
+ tr[0]+' region carries '+Math.round(tr[1]/n*100)+'% of all complaints; the busiest city is '+tc[0]+' ('+tc[1]+' tickets).',
+ tp[0]+' is the most affected product ('+Math.round(tp[1]/n*100)+'% of tickets).',
+ late?late+' ticket(s) ('+(late/n*100).toFixed(1)+'%) have a TI TAT of 4+ days and need escalation.':'No ticket has a TI TAT of 4+ days.',
+ cn[0]+' is the top call nature ('+cn[1]+' tickets, '+Math.round(cn[1]/n*100)+'%).',crit+' tickets ('+Math.round(crit/n*100)+'%) are High/Critical priority.',old+' ticket(s) are older than 7 days by BD TAT.','Average TI TAT is '+avg.toFixed(1)+' days; '+Math.round(rows.filter(function(r){return r[4]<=1}).length/n*100)+'% of tickets were handled within 1 day.'];
+ window.INS=I;$('ins').innerHTML=I.map(function(s){return'<li>'+esc(s)+'</li>'}).join('')}
+function parse(buf){
+ var wb=XLSX.read(buf,{type:'array'}),a=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:null});
+ var hi=a.findIndex(function(r){return r&&r.indexOf('Ticket_Type')>-1});if(hi<0)throw new Error('Header row with "Ticket_Type" not found');
+ var h=a[hi],opt=['Priority','Call Nature','BD TAT','Created_Date'].map(function(c){return h.indexOf(c)}),ix=['Ticket_Type','Product','Region - Problem Occurred At','City - Problem Occurred At','TI TAT'].map(function(c){var i=h.indexOf(c);if(i<0)throw new Error('Missing column: '+c);return i});
+ var out=[];a.slice(hi+1).forEach(function(r){var v=ix.map(function(i){return r[i]}).concat(opt.map(function(i){return i<0?null:r[i]}));v[5]=v[5]||'Unknown';v[6]=v[6]||'Unknown';v[7]=(v[7]==null||isNaN(v[7]))?null:Number(v[7]);v[8]=String(v[8]||'N/A');if(v[0]&&v[2]&&v[3]&&v[4]!=null&&!isNaN(v[4])){v[4]=Number(v[4]);v[0]=String(v[0]).trim();v[1]=String(v[1]).trim();v[2]=String(v[2]).trim().toUpperCase();v[3]=String(v[3]).trim().toUpperCase();out.push(v)}});
+ if(!out.length)throw new Error('No valid data rows found');return out}
+$('up').onchange=function(e){var f=e.target.files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){try{DATA=parse(fr.result);render(DATA);$('src').textContent='Loaded: '+f.name+' ('+DATA.length+' tickets)';$('msg').textContent=''}catch(x){$('msg').textContent='⚠ '+x.message}};fr.readAsArrayBuffer(f);e.target.value=''};
+var BLUE='FFB4C6E7',GREY='FFD9D9D9',GREEN='FFC6E0B4',LBLUE='FFD9E1F2',BARC='FFFF7A80';
+function sc(c,o){var f={name:'Calibri',size:11,bold:!!o.b};if(o.red)f.color={argb:'FFFF0000'};c.font=f;
+ if(o.f)c.fill={type:'pattern',pattern:'solid',fgColor:{argb:o.f}};
+ c.alignment={horizontal:o.h||'center',vertical:'middle'};var b={style:'thin',color:{argb:'FFBFBFBF'}};c.border={top:b,left:b,bottom:b,right:b};if(o.nf)c.numFmt=o.nf}
+function bars(ws,ref){ws.addConditionalFormatting({ref:ref,rules:[{type:'dataBar',priority:1,gradient:true,minLength:0,maxLength:100,cfvo:[{type:'num',value:0},{type:'max'}],color:{argb:BARC}}]})}
+function xCross(ws,rows,ri,regs,label,ord,mode){
+ var keys=ord||keysByTotal(rows,ri),n=rows.length,col=mode==='col',tc=regs.length+2,pc=tc+1,r=2;
+ [label].concat(regs,['Grand Total'],col?['%Age']:[]).forEach(function(v,i){var c=ws.getCell(1,i+1);c.value=v;sc(c,{b:1})});
+ keys.forEach(function(k){var rr=rows.filter(function(x){return x[ri]===k}),c=ws.getCell(r,1);c.value=k;sc(c,{f:BLUE,h:'left'});
+  regs.forEach(function(g,i){var x=ws.getCell(r,i+2),v=rr.filter(function(y){return y[2]===g}).length;x.value=v||null;sc(x,{f:BLUE})});
+  var t=ws.getCell(r,tc);t.value=rr.length;sc(t,{h:'right'});
+  if(col){var p=ws.getCell(r,pc);p.value=rr.length/n;sc(p,{h:'right',nf:'0.0%'})}r++});
+ var last=r-1,fl=col?GREEN:null;
+ var g=ws.getCell(r,1);g.value='Grand Total';sc(g,{b:1,f:fl,h:'left'});
+ regs.forEach(function(gg,i){var x=ws.getCell(r,i+2);x.value=rows.filter(function(y){return y[2]===gg}).length;sc(x,{b:1,f:fl})});
+ var gt=ws.getCell(r,tc);gt.value=n;sc(gt,{b:1,f:fl,h:'right'});
+ if(col){var gp=ws.getCell(r,pc);gp.value=1;sc(gp,{b:1,f:fl,h:'right',nf:'0%'})}
+ else{r++;var a=ws.getCell(r,1);a.value='%Age';sc(a,{b:1,f:GREEN,h:'left'});
+  regs.forEach(function(gg,i){var x=ws.getCell(r,i+2);x.value=rows.filter(function(y){return y[2]===gg}).length/n;sc(x,{b:1,f:GREEN,nf:'0%'})});
+  var a2=ws.getCell(r,tc);a2.value=1;sc(a2,{b:1,f:GREEN,h:'right',nf:'0%'})}
+ bars(ws,ws.getCell(2,tc).address+':'+ws.getCell(last,tc).address);
+ if(col)bars(ws,ws.getCell(2,pc).address+':'+ws.getCell(last,pc).address);
+ ws.getColumn(1).width=Math.max(16,label.length+4,Math.max.apply(null,keys.map(function(k){return String(k).length+4})));
+ for(var i=2;i<=pc;i++)ws.getColumn(i).width=13;ws.views=[{showGridLines:false}]}
+function xTat(ws,C){
+ var rows=C.rows,regs=C.regs,tats=Object.keys(cnt(rows,function(r){return r[4]})).map(Number).sort(function(a,b){return a-b}),tc=tats.length+3,r=2,refs=[];
+ ['Region - Problem Occurred At','City - Problem Occurred At'].concat(tats,['Grand Total']).forEach(function(v,i){var c=ws.getCell(1,i+1);c.value=v;sc(c,{b:1,red:i>=2&&i<tc-1&&v>=4})});
+ regs.forEach(function(g){var rr=rows.filter(function(x){return x[2]===g}),cities=keysByTotal(rr,3),s=r;
+  cities.forEach(function(ct){var cr=rr.filter(function(x){return x[3]===ct}),c=ws.getCell(r,2);c.value=ct;sc(c,{f:BLUE,h:'left'});
+   tats.forEach(function(t,i){var x=ws.getCell(r,i+3),v=cr.filter(function(y){return y[4]===t}).length;x.value=v||null;sc(x,{red:t>=4})});
+   var tt=ws.getCell(r,tc);tt.value=cr.length;sc(tt,{h:'right'});r++});
+  ws.getCell(s,1).value=g;for(var k=s;k<r;k++)sc(ws.getCell(k,1),{b:1,f:GREY});if(r-1>s)ws.mergeCells(s,1,r-1,1);
+  refs.push(ws.getCell(s,tc).address+':'+ws.getCell(r-1,tc).address);
+  var T=ws.getCell(r,1);T.value=g+' Total';sc(T,{b:1,f:GREY});sc(ws.getCell(r,2),{b:1,f:GREY});ws.mergeCells(r,1,r,2);
+  tats.forEach(function(t,i){var x=ws.getCell(r,i+3),v=rr.filter(function(y){return y[4]===t}).length;x.value=v||null;sc(x,{b:1})});
+  var t2=ws.getCell(r,tc);t2.value=rr.length;sc(t2,{b:1,h:'right'});r++});
+ var G=ws.getCell(r,1);G.value='Grand Total';sc(G,{b:1,f:LBLUE});sc(ws.getCell(r,2),{b:1,f:LBLUE});ws.mergeCells(r,1,r,2);
+ tats.forEach(function(t,i){var x=ws.getCell(r,i+3);x.value=rows.filter(function(y){return y[4]===t}).length;sc(x,{b:1,f:LBLUE})});
+ var g2=ws.getCell(r,tc);g2.value=rows.length;sc(g2,{b:1,f:LBLUE,h:'right'});
+ bars(ws,refs.join(' '));ws.getColumn(1).width=28;ws.getColumn(2).width=26;for(var i=3;i<=tc;i++)ws.getColumn(i).width=i==tc?14:6;ws.views=[{showGridLines:false}]}
+var REP={t1:function(w,C){xCross(w,C.rows,0,C.regs,'Segment',null,'row')},t2:xTat,t3:function(w,C){xCross(w,C.rows,1,C.regs,'Product',null,'col')},
+ t4:function(w,C){xCross(w,C.rows,5,C.regs,'Priority',null,'row')},t5:function(w,C){xCross(w,C.rows,6,C.regs,'Call Nature',null,'row')},
+ t6:function(w,C){xCross(w,C.rows,9,C.regs,'BD TAT Ageing',C.ag,'row')},t7:function(w,C){xCross(w,C.rows,8,C.regs,'Created Date',C.dates,'row')}};
+async function save(wb,name){try{var buf=await wb.xlsx.writeBuffer(),d=null;
+ try{if(typeof claude!=='undefined'&&claude&&claude.use)d=await claude.use('downloads')}catch(e){d=null}
+ if(d){await d.save({filename:name,data:buf});return}
+ var u=URL.createObjectURL(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})),a=document.createElement('a');
+ a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);$('msg').textContent='Downloading '+name+'…'}
+ catch(x){if(!x||x.code!=='declined')$('msg').textContent='⚠ '+(x&&x.message||'Download failed')}}
+function addRep(wb,b){var ws=wb.addWorksheet(b.dataset.n.slice(0,31));REP[b.dataset.t](ws,window.CUR)}
+document.querySelectorAll('.dl').forEach(function(b){b.onclick=function(){var wb=new ExcelJS.Workbook();addRep(wb,b);save(wb,b.dataset.n.replace(/[^\w]+/g,'_')+'.xlsx')}});
+$('all').onclick=function(){var wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('Summary'),r=1;
+ ws.addRow(['Care Connect CRM Report Summary']).font={name:'Calibri',bold:true,size:14};ws.addRow([]);
+ window.KP.forEach(function(k){var x=ws.addRow([k[1],k[0]]);x.font={name:'Calibri',size:11}});ws.addRow([]);ws.addRow(['Insights']).font={name:'Calibri',bold:true};
+ window.INS.forEach(function(s){ws.addRow([s]).font={name:'Calibri',size:11}});ws.getColumn(1).width=30;ws.getColumn(2).width=22;
+ document.querySelectorAll('.dl').forEach(function(b){addRep(wb,b)});save(wb,'CRM_Dashboard_Reports.xlsx')};
+render(DATA);
+</script></body></html>
