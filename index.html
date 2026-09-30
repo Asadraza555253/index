@@ -1,34 +1,130 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Care Connect CRM Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f6fa;--card:#fff;--tx:#1c2333;--mut:#667085;--hd:#1f3a68;--blue:#b4c6e7;--grey:#d9d9d9;--green:#c6e0b4;--bar:#f4a3a3;--red:#d92d20;--ln:#d0d5dd}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11151c;--card:#1b212c;--tx:#e6e9ef;--mut:#98a2b3;--hd:#2b4b82;--blue:#2a3d63;--grey:#2f3644;--green:#2f4a2f;--bar:#7a3535;--red:#ff7a70;--ln:#39424f}}
-:root[data-theme="dark"]{--bg:#11151c;--card:#1b212c;--tx:#e6e9ef;--mut:#98a2b3;--hd:#2b4b82;--blue:#2a3d63;--grey:#2f3644;--green:#2f4a2f;--bar:#7a3535;--red:#ff7a70;--ln:#39424f}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 Arial,Helvetica,sans-serif}
-header{background:var(--hd);color:#fff;padding:16px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-h1{margin:0;font-size:20px}header small{opacity:.8}
-button,label.b{background:#fff;color:#1f3a68;border:0;border-radius:6px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px}
-main{padding:16px 20px;max-width:1200px;margin:auto}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
-.k,.c{background:var(--card);border:1px solid var(--ln);border-radius:10px;padding:14px}
-.k b{display:block;font-size:24px}.k span{color:var(--mut);font-size:12px}
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
-.c h2{margin:0 0 10px;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:8px}.dl{background:var(--hd);color:#fff;padding:5px 10px;font-size:12px}.w{overflow-x:auto}
-table{border-collapse:collapse;width:100%;text-align:center}th,td{border:1px solid var(--ln);padding:5px 8px;white-space:nowrap}
-th{background:var(--card);color:var(--tx);font-weight:700}td.l{background:var(--blue);text-align:left}td.r{background:var(--grey);font-weight:700}
-tr.t td{background:var(--grey);font-weight:700}tr.p td{background:var(--green);font-weight:700}
-.bar{position:relative;text-align:right;min-width:70px}.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--bar);z-index:0}.bar s{position:relative;text-decoration:none;font-weight:700}
-.red{color:var(--red);font-weight:700}
-ul{margin:0;padding-left:18px}li{margin:4px 0}.full{grid-column:1/-1}
-#msg{font-size:12px;color:#fff;opacity:.9}
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f5f7fb;--card:#fff;--card2:#f8fafc;--tx:#182230;--mut:#667085;
+  --hd:#123b68;--hd2:#0b2a4a;--accent:#1677ff;--accent2:#5b8def;
+  --blue:#eaf2ff;--grey:#eef2f6;--green:#e8f7ee;--bar:#8eb8ff;
+  --red:#d92d20;--amber:#b54708;--ln:#e4e9f0;--shadow:0 8px 28px rgba(16,40,72,.07);
+  --shadow2:0 14px 40px rgba(16,40,72,.12)
+}
+*{box-sizing:border-box}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1220;--card:#121b2a;--card2:#172235;--tx:#eef4ff;--mut:#9aa8bd;
+  --hd:#0e2744;--hd2:#081b31;--blue:#1c3558;--grey:#263142;--green:#183d2a;
+  --bar:#527fca;--ln:#29374a;--shadow:0 8px 28px rgba(0,0,0,.2);--shadow2:0 14px 40px rgba(0,0,0,.28)
+}}
+:root[data-theme="dark"]{
+  --bg:#0b1220;--card:#121b2a;--card2:#172235;--tx:#eef4ff;--mut:#9aa8bd;
+  --hd:#0e2744;--hd2:#081b31;--blue:#1c3558;--grey:#263142;--green:#183d2a;
+  --bar:#527fca;--ln:#29374a;--shadow:0 8px 28px rgba(0,0,0,.2);--shadow2:0 14px 40px rgba(0,0,0,.28)
+}
+html{scroll-behavior:smooth;scroll-padding-top:18px}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;min-height:100vh}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 85% 0%,rgba(22,119,255,.07),transparent 30%),radial-gradient(circle at 0% 100%,rgba(18,59,104,.05),transparent 28%);z-index:-1}
+header{
+  position:sticky;top:0;z-index:20;color:#fff;padding:18px clamp(18px,3vw,42px);
+  display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;
+  background:linear-gradient(115deg,var(--hd2),var(--hd) 55%,#16518a);
+  box-shadow:0 6px 24px rgba(5,24,46,.18);border-bottom:1px solid rgba(255,255,255,.1)
+}
+header:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#5b8def,#7cc7ff,transparent)}
+header>div:first-child{display:flex;align-items:center;gap:14px}
+header>div:first-child:before{content:"CC";display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);font-weight:800;letter-spacing:-1px;box-shadow:inset 0 1px rgba(255,255,255,.12)}
+h1{margin:0;font-size:21px;letter-spacing:-.4px;font-weight:800}
+header small{display:block;opacity:.72;margin-top:2px;font-size:12px}
+#msg{font-size:12px;color:#fff;opacity:.9;min-height:18px}
+.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button,label.b{
+  appearance:none;background:#fff;color:#143a65;border:1px solid rgba(255,255,255,.16);border-radius:9px;
+  padding:9px 13px;font-weight:750;cursor:pointer;font-size:12.5px;transition:.18s ease;box-shadow:0 3px 10px rgba(0,0,0,.08)
+}
+button:hover,label.b:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.13)}
+button:active,label.b:active{transform:translateY(0)}
+#all{background:#fff}
+#theme{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.18);box-shadow:none}
+label.b{background:rgba(255,255,255,.11);color:#fff;border-color:rgba(255,255,255,.2)}
+main{padding:24px clamp(16px,3vw,42px) 40px;max-width:1500px;margin:auto}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.k{
+  position:relative;overflow:hidden;background:var(--card);border:1px solid var(--ln);border-radius:15px;padding:18px;
+  box-shadow:var(--shadow);transition:.2s ease;min-height:102px
+}
+.k:hover{transform:translateY(-2px);box-shadow:var(--shadow2)}
+.k:after{content:"";position:absolute;right:-24px;top:-28px;width:90px;height:90px;border-radius:50%;background:rgba(22,119,255,.055)}
+.k b{display:block;font-size:25px;line-height:1.15;letter-spacing:-.6px;margin:7px 0 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k span{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.7px;font-weight:700}
+.k:first-child b{color:var(--accent)}
+.g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.c{
+  background:rgba(255,255,255,.82);background:var(--card);border:1px solid var(--ln);border-radius:16px;
+  padding:16px;box-shadow:var(--shadow);min-width:0;overflow:hidden
+}
+.c h2{margin:0 0 13px;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:800;letter-spacing:.05px}
+.c h2 span{display:flex;align-items:center;gap:9px}
+.c h2 span:before{content:"";width:4px;height:18px;border-radius:5px;background:var(--accent)}
+.c h2:after{content:"";flex:1;height:1px;background:var(--ln);order:1;margin-left:4px}
+.c h2 .dl{order:2}
+.dl{background:var(--hd);color:#fff;padding:6px 10px;font-size:11px;border-radius:7px;box-shadow:none;position:relative;z-index:2}
+.w{overflow:auto;border:1px solid var(--ln);border-radius:10px;background:var(--card2);max-height:430px}
+.full{grid-column:1/-1}
+table{border-collapse:separate;border-spacing:0;width:100%;text-align:center;font-size:12px}
+th,td{border:0;border-bottom:1px solid var(--ln);border-right:1px solid var(--ln);padding:7px 9px;white-space:nowrap}
+th{position:sticky;top:0;z-index:3;background:var(--card2);color:var(--mut);font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.45px}
+th:last-child,td:last-child{border-right:0}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:rgba(22,119,255,.035)}
+td.l{background:var(--blue);text-align:left;font-weight:650}
+td.r{background:var(--grey);font-weight:800}
+tr.t td{background:var(--grey);font-weight:800}
+tr.p td{background:var(--green);font-weight:800;color:var(--tx)}
+.bar{position:relative;text-align:right;min-width:76px;background:transparent!important}
+.bar i{position:absolute;left:3px;top:4px;bottom:4px;background:var(--bar);opacity:.38;border-radius:4px;z-index:0}
+.bar s{position:relative;text-decoration:none;font-weight:800}
+.red{color:var(--red);font-weight:800}
+ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+li{margin:0;padding:10px 12px 10px 35px;background:var(--card2);border:1px solid var(--ln);border-radius:10px;position:relative;color:var(--tx)}
+li:before{content:"✦";position:absolute;left:13px;top:9px;color:var(--accent);font-weight:800}
+#t6 td.red{background:rgba(217,45,32,.06)}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){
+  header{position:relative;padding:15px 16px}.header-actions{width:100%}.header-actions button,.header-actions label{flex:1;text-align:center}
+  main{padding:16px 12px 28px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.k{padding:14px;min-height:90px}.k b{font-size:21px}
+  .g{grid-template-columns:1fr}.full{grid-column:auto}ul{grid-template-columns:1fr}.w{max-height:360px}
+}
+@media(max-width:430px){.kpis{grid-template-columns:1fr 1fr}.k b{font-size:18px}h1{font-size:18px}}
+
+/* Executive-grade visual layer */
+.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin:4px 0 25px;padding:26px 28px;border:1px solid var(--ln);border-radius:18px;background:linear-gradient(135deg,var(--card),var(--card2));box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:320px;height:320px;border-radius:50%;right:-120px;top:-180px;background:radial-gradient(circle,rgba(22,119,255,.12),transparent 68%);pointer-events:none}
+.eyebrow{font-size:10px;font-weight:850;letter-spacing:1.5px;color:var(--accent);margin-bottom:7px}
+.hero h2{margin:0;font-size:25px;letter-spacing:-.7px;font-weight:850}.hero p{margin:7px 0 0;color:var(--mut);font-size:13px;max-width:720px}
+.hero-meta{display:flex;align-items:center;gap:8px;white-space:nowrap;color:var(--mut);font-size:11px;font-weight:700;background:var(--card);border:1px solid var(--ln);padding:9px 12px;border-radius:999px;box-shadow:0 3px 10px rgba(16,40,72,.04);z-index:1}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#20a464;box-shadow:0 0 0 4px rgba(32,164,100,.12)}.meta-sep{opacity:.45}
+.section-label{display:flex;align-items:center;gap:12px;margin:0 0 11px;color:var(--mut);font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:1.1px}.section-label i{height:1px;background:var(--ln);flex:1}
+.k{padding:16px 17px;min-height:116px}.k-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.k-icon{width:29px;height:29px;display:grid;place-items:center;border-radius:8px;background:var(--blue);color:var(--accent);font-size:15px;font-weight:900}.k-caption{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:.65px;font-weight:800}.k b{margin:13px 0 4px;font-size:24px}.k-label{display:block;color:var(--mut);font-size:11px;font-weight:650}.k1 .k-icon{background:rgba(91,141,239,.12);color:#5279c7}.k2 .k-icon{background:rgba(22,119,255,.09);color:#1677ff}.k3 .k-icon{background:rgba(180,137,0,.11);color:#a27b00}.k4 .k-icon{background:rgba(217,45,32,.09);color:var(--red)}.k4 b{color:var(--red)}
+.c{border-radius:14px;padding:15px}.c h2{font-size:13px;margin-bottom:11px}.dl{font-weight:800;letter-spacing:.1px}.w{box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
 </style></head><body>
-<header><div><h1>Care Connect – CRM Dashboard</h1><small id="src">Loaded: sample CRM report</small></div>
-<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span id="msg"></span>
-<button id="all">⬇ Download all reports (Excel)</button>
-<label class="b">⬆ Upload CRM file<input id="up" type="file" accept=".xlsx,.xls,.csv" hidden></label></div></header>
+<header><div><div><h1>Care Connect – CRM Dashboard</h1><small id="src">Loaded: sample CRM report</small></div></div>
+<div class="header-actions"><span id="msg"></span>
+<button id="theme" title="Toggle dark mode">◐ Theme</button>
+<button id="all">↓ Download all reports (Excel)</button>
+<label class="b">↑ Upload CRM file<input id="up" type="file" accept=".xlsx,.xls,.csv" hidden></label></div></header>
 <main>
+<section class="hero">
+  <div>
+    <div class="eyebrow">OPERATIONS INTELLIGENCE</div>
+    <h2>CRM Performance Overview</h2>
+    <p>Monitor ticket volume, regional distribution, product impact and turnaround performance from one workspace.</p>
+  </div>
+  <div class="hero-meta"><span class="live-dot"></span><span>Dashboard ready</span><span class="meta-sep">•</span><span id="updated">Live data view</span></div>
+</section>
+<div class="section-label"><span>Executive Summary</span><i></i></div>
 <div class="kpis" id="kpis"></div>
+<div class="section-label"><span>Detailed Analysis</span><i></i></div>
 <div class="g">
 <div class="c"><h2><span>Segment by Region</span><button class="dl" data-t="t1" data-n="Segment by Region">⬇ Excel</button></h2><div class="w" id="t1"></div></div>
 <div class="c"><h2><span>Product by Region</span><button class="dl" data-t="t3" data-n="Product by Region">⬇ Excel</button></h2><div class="w" id="t3"></div></div>
@@ -93,7 +189,8 @@ function parse(buf){
  var h=a[hi],opt=['Priority','Call Nature','BD TAT','Created_Date'].map(function(c){return h.indexOf(c)}),ix=['Ticket_Type','Product','Region - Problem Occurred At','City - Problem Occurred At','TI TAT'].map(function(c){var i=h.indexOf(c);if(i<0)throw new Error('Missing column: '+c);return i});
  var out=[];a.slice(hi+1).forEach(function(r){var v=ix.map(function(i){return r[i]}).concat(opt.map(function(i){return i<0?null:r[i]}));v[5]=v[5]||'Unknown';v[6]=v[6]||'Unknown';v[7]=(v[7]==null||isNaN(v[7]))?null:Number(v[7]);v[8]=String(v[8]||'N/A');if(v[0]&&v[2]&&v[3]&&v[4]!=null&&!isNaN(v[4])){v[4]=Number(v[4]);v[0]=String(v[0]).trim();v[1]=String(v[1]).trim();v[2]=String(v[2]).trim().toUpperCase();v[3]=String(v[3]).trim().toUpperCase();out.push(v)}});
  if(!out.length)throw new Error('No valid data rows found');return out}
-$('up').onchange=function(e){var f=e.target.files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){try{DATA=parse(fr.result);render(DATA);$('src').textContent='Loaded: '+f.name+' ('+DATA.length+' tickets)';$('msg').textContent=''}catch(x){$('msg').textContent='⚠ '+x.message}};fr.readAsArrayBuffer(f);e.target.value=''};
+$('up').onchange=function(e){var f=e.target.files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){try{DATA=parse(fr.result);(function(){var t=document.getElementById("theme"),root=document.documentElement,s=localStorage.getItem("cc-theme");if(s)root.setAttribute("data-theme",s);t.onclick=function(){var d=root.getAttribute("data-theme")==="dark";root.setAttribute("data-theme",d?"light":"dark");localStorage.setItem("cc-theme",d?"light":"dark")}})();
+render(DATA);$('src').textContent='Loaded: '+f.name+' ('+DATA.length+' tickets)';$('msg').textContent=''}catch(x){$('msg').textContent='⚠ '+x.message}};fr.readAsArrayBuffer(f);e.target.value=''};
 var BLUE='FFB4C6E7',GREY='FFD9D9D9',GREEN='FFC6E0B4',LBLUE='FFD9E1F2',BARC='FFFF7A80';
 function sc(c,o){var f={name:'Calibri',size:11,bold:!!o.b};if(o.red)f.color={argb:'FFFF0000'};c.font=f;
  if(o.f)c.fill={type:'pattern',pattern:'solid',fgColor:{argb:o.f}};
@@ -150,5 +247,6 @@ $('all').onclick=function(){var wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('Su
  window.KP.forEach(function(k){var x=ws.addRow([k[1],k[0]]);x.font={name:'Calibri',size:11}});ws.addRow([]);ws.addRow(['Insights']).font={name:'Calibri',bold:true};
  window.INS.forEach(function(s){ws.addRow([s]).font={name:'Calibri',size:11}});ws.getColumn(1).width=30;ws.getColumn(2).width=22;
  document.querySelectorAll('.dl').forEach(function(b){addRep(wb,b)});save(wb,'CRM_Dashboard_Reports.xlsx')};
+(function(){var t=document.getElementById("theme"),root=document.documentElement,s=localStorage.getItem("cc-theme");if(s)root.setAttribute("data-theme",s);t.onclick=function(){var d=root.getAttribute("data-theme")==="dark";root.setAttribute("data-theme",d?"light":"dark");localStorage.setItem("cc-theme",d?"light":"dark")}})();
 render(DATA);
 </script></body></html>
